@@ -1,0 +1,96 @@
+-- creacion base de datos
+CREATE SCHEMA `minimarket` DEFAULT CHARACTER SET utf8 ;
+
+-- usar base de datos 'minimarket'
+use minimarket;
+
+-- crear tabla categorias
+
+CREATE TABLE `minimarket`.`categorias` (
+  `id_categoria` INT NOT NULL AUTO_INCREMENT,
+  `descripcion` VARCHAR(45) NOT NULL,
+  `estado` TINYINT NULL,
+  PRIMARY KEY (`id_categoria`));
+
+-- crear tabla clientes
+
+CREATE TABLE `minimarket`.`clientes` (
+  `id_cliente` VARCHAR(45) NOT NULL,
+  `nombres` VARCHAR(45) NOT NULL,
+  `apellidos` VARCHAR(45) NOT NULL,
+  `numero_telefonico` VARCHAR(45) NOT NULL,
+  `direccion` VARCHAR(45) NOT NULL,
+  `correo_electronico` VARCHAR(70) NOT NULL,
+  PRIMARY KEY (`id_cliente`),
+  UNIQUE INDEX `id_cliente_UNIQUE` (`id_cliente` ASC) VISIBLE);
+
+-- crear tabla compras
+
+CREATE TABLE `minimarket`.`compras` (
+  `id_compra` INT NOT NULL AUTO_INCREMENT,
+  `id_cliente` VARCHAR(45) NOT NULL,
+  `fecha` DATETIME NULL,
+  `medio_pago` CHAR(1) NULL,
+  `comentario` VARCHAR(300) NULL,
+  `estado` CHAR(1) NULL,
+  PRIMARY KEY (`id_compra`));
+
+ALTER TABLE `minimarket`.`compras` 
+ADD INDEX `cliente_compra_idx` (`id_cliente` ASC) VISIBLE;
+;
+ALTER TABLE `minimarket`.`compras` 
+ADD CONSTRAINT `cliente_compra`
+  FOREIGN KEY (`id_cliente`)
+  REFERENCES `minimarket`.`clientes` (`id_cliente`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+-- crear tabla productos
+
+CREATE TABLE `minimarket`.`productos` (
+  `id_producto` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(45) NULL,
+  `id_categoria` INT NOT NULL,
+  `codigo_barras` VARCHAR(150) NULL,
+  `precio_venta` DOUBLE NULL,
+  `cantidad_stock` INT NULL,
+  `estado` TINYINT NULL,
+  PRIMARY KEY (`id_producto`));
+
+ALTER TABLE `minimarket`.`productos` 
+ADD INDEX `productos_categorias_idx` (`id_categoria` ASC) VISIBLE;
+;
+ALTER TABLE `minimarket`.`productos` 
+ADD CONSTRAINT `productos_categorias`
+  FOREIGN KEY (`id_categoria`)
+  REFERENCES `minimarket`.`categorias` (`id_categoria`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+-- crear tabla compras productos
+
+CREATE TABLE `minimarket`.`compras_productos` (
+  `id_compra` INT NOT NULL,
+  `id_producto` INT NOT NULL,
+  `cantidad` INT NOT NULL,
+  `total` DOUBLE NULL,
+  `estado` TINYINT NULL);
+
+
+-- estableciendo la llaves foraneas
+
+ALTER TABLE `minimarket`.`compras_productos` 
+ADD INDEX `producto_compras_idx` (`id_compra` ASC) VISIBLE,
+ADD INDEX `compras_productos_idx` (`id_producto` ASC) VISIBLE;
+;
+ALTER TABLE `minimarket`.`compras_productos` 
+ADD CONSTRAINT `producto_compras`
+  FOREIGN KEY (`id_compra`)
+  REFERENCES `minimarket`.`compras` (`id_compra`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `compras_productos`
+  FOREIGN KEY (`id_producto`)
+  REFERENCES `minimarket`.`productos` (`id_producto`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
